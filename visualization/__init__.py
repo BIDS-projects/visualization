@@ -9,14 +9,14 @@ app = Flask(__name__)
 config = DevelopmentConfig
 
 # Configuration for mySQL database
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://{username}:{password}@{host}/{database}'.format(
-    username=config.username,
-    password=config.password,
-    host=config.host,
-    database=config.database
-)
-db = SQLAlchemy(app)
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://{username}:{password}@{host}/{database}'.format(
+#     username=config.username,
+#     password=config.password,
+#     host=config.host,
+#     database=config.database
+# )
+# db = SQLAlchemy(app)
 
 from visualization.maps.views import maps
 from visualization.public.views import public

@@ -25,7 +25,7 @@ var colors = {{ colors_json | safe }};
     <ul>
       {% for category in categories %}
       <li onclick="catColorAlpha('{{ category }}')">
-        <div class="color-label col-md-2"><span class="color-box" style="background-color:rgba(90, 120, 150, 1)"></span></div>
+        <div class="color-label col-md-2"><span class="color-box" style="background-color:rgb({{ ','.join(colors[category]) }})"></span></div>
         <div class="text-label col-md-10"><span>{{ category }}</span></div>
       </li>
       {% endfor %}

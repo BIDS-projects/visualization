@@ -38,7 +38,7 @@ def home():
     for edge in edges:
         edge.from_v = mapper[edge.from_id]
         edge.to_v = mapper[edge.to_id]
-        edge.weight = 10*((edge.weight - least)/diff)
+        edge.weight = 5*((edge.weight - least)/diff)
     return render_template('topicsmap.html',
         vertices=vertices,
         edges=edges)

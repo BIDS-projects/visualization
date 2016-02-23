@@ -9,8 +9,8 @@ var nodes = [{% for vertex in vertices %}
 var edges = [{% for edge in edges %}
   {'source': {{ edge.from_v }}, 'target': {{ edge.to_v }}, 'thickness': {{ edge.weight}} },{% endfor %}
 ];
-var topics = [
-]
+var categories = [{{ categories_json | safe }}]
+var colors = {{ colors_json | safe }}
 </script>
 {% endblock %}
 {% block content %}
@@ -23,13 +23,13 @@ var topics = [
       <h2 class="subtitle">Topics</h2>
     </div>
     <ul>
-      <li>
+      {% for category in categories %}
+      <li onclick="catColorAlpha('{{ category }}')">
         <div class="color-label col-md-2"><span class="color-box" style="background-color:rgba(90, 120, 150, 1)"></span></div>
-        <div class="text-label col-md-10"><span>Topic 1</span></div>
+        <div class="text-label col-md-10"><span>{{ category }}</span></div>
       </li>
+      {% endfor %}
     </ul>
-    {% for topic in topics %}
-    {% endfor %}
   </aside>
 </body>
 {% endblock %}

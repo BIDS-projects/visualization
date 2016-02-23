@@ -39,6 +39,16 @@ def home():
         edge.from_v = mapper[edge.from_id]
         edge.to_v = mapper[edge.to_id]
         edge.weight = 5*((edge.weight - least)/diff)
+
+    # temporary randomly-generated categories
+    import random
+    import json
+    categories = dict((c, dict((v.i, random.random()) for v in vertices)) for c in ('dibya', 'blake', 'alvin', 'blaya', 'dibke'))
+    colors = {'alvin': [0, 169, 190], 'dibya': [100, 0, 0], 'blake': [50, 70, 150]}
+
     return render_template('topicsmap.html',
         vertices=vertices,
-        edges=edges)
+        edges=edges,
+        categories=categories,
+        categories_json=json.dumps(categories),
+        colors_json=json.dumps(colors))

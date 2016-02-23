@@ -47,21 +47,13 @@ var catColorAlpha = function(focusCategory){
 	var rgb = colors[focusCategory];
 	var rgbaString = "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2];
 	var colorCalcVert = function(d){
-	 // We are going to add alpha in the loop
-		for (i = 0; i < 10; i += 1){ // Probably a better way to do this, will revisit. //
-			var strNum = i.toString();
-			console.log(strNum);
-			if (strNum == d.name){
-				rgbaString + "," + dict[strNum] + ")";
-				console.log(rgbaString)
-				return rgbaString + "," + dict[strNum] + ")";
-			}
-		}
+	  // We are going to add alpha in the loop
+    return rgbaString + "," + dict[d.name] + ")";
 	}
 	var colorCalcEdge = function(d){
 		var alpha1 = d.source.name.toString();
 		var alpha2 = d.target.name.toString();
-		return  rgbaString + "," + Math.max(dict[alpha1], dict[alpha2]);
+		return  rgbaString + "," + Math.max(dict[alpha1], dict[alpha2]) + ")";
 	}
 	var svg = d3.select("#canvas-svg");
 	var node = svg.selectAll(".node");

@@ -44,7 +44,8 @@ def home():
     import random
     import json
     categories = dict((c, dict((v.i, random.random()) for v in vertices)) for c in ('dibya', 'blake', 'alvin', 'blaya', 'dibke'))
-    colors = {'alvin': [0, 169, 190], 'dibya': [100, 0, 0], 'blake': [50, 70, 150]}
+    available = [0, 169, 190], [100, 0, 0], [50, 70, 150]
+    colors = dict((cat, random.choice(available)) for cat in categories)
 
     return render_template('topicsmap.html',
         vertices=vertices,

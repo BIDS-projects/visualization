@@ -9,8 +9,8 @@ var nodes = [{% for vertex in vertices %}
 var edges = [{% for edge in edges %}
   {'source': {{ edge.from_v }}, 'target': {{ edge.to_v }}, 'thickness': {{ edge.weight}} },{% endfor %}
 ];
-var categories = [{{ categories_json | safe }}]
-var colors = {{ colors_json | safe }}
+var categories = {{ categories_json | safe }};
+var colors = {{ colors_json | safe }};
 </script>
 {% endblock %}
 {% block content %}

@@ -82,6 +82,7 @@ aside li, aside ul {
     padding:1em 2em;
     border-top:1px solid #eee;
     border-bottom:1px solid #eee;
+    cursor:pointer;
   }
   aside li + li {
     border-top:none;

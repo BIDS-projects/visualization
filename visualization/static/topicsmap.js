@@ -6,7 +6,14 @@ var drawD3Document = function(nodes,links) {
     svg.append("svg:defs").selectAll("marker").data([ "end" ]).enter().append("svg:marker").attr("id", String).attr("viewBox", "0 -5 10 10").attr("refX", 15).attr("refY", -1.5).attr("markerWidth", 6).attr("markerHeight", 6).attr("orient", "auto").append("svg:path").attr("d", "M0,-5L10,0L0,5");
     var path = svg.append("svg:g").selectAll("path").data(force.links()).enter().append("svg:path").style('stroke-width',function(d){return d.thickness}).attr("class", "link");
 
-    var node = svg.selectAll(".node").data(force.nodes()).enter().append("g").attr("class", "node").call(force.drag);
+    var node = svg.selectAll(".node")
+      .data(force.nodes())
+      .enter()
+      .append("g")
+      .attr("class", "node")
+      .on('click', function(d) { focusVertex(d.name) })
+      .call(force.drag);
+
     node.append("circle").attr("r", 10);
     node.append("text").attr("x", "-.25em").attr("dy", ".35em").text(function(d) {
         return d.name;
@@ -24,6 +31,7 @@ var drawD3Document = function(nodes,links) {
         });
     }
 };
+
 var focusOn = function(f1,f2){
 	var svg = d3.select("#canvas-svg");
 	var node = svg.selectAll(".node");

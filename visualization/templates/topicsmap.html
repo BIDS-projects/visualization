@@ -26,36 +26,16 @@ text {
 </style>
 
 <script>
-var nodes = [{'category': 'dibya', 'name': 'a'},
- {'category': 'alvin', 'name': 'b'},
- {'category': 'blake', 'name': 'c'},
- {'category': 'alvin', 'name': 'd'},
- {'category': 'dibya', 'name': 'e'},
- {'category': 'alvin', 'name': 'f'},
- {'category': 'dibya', 'name': 'g'},
- {'category': 'alvin', 'name': 'h'},
- {'category': 'blake', 'name': 'i'},
- {'category': 'blake', 'name': 'j'}]
- var edges = [{'source': 1, 'target': 6, 'thickness': 1},
- {'source': 1, 'target': 4, 'thickness': 10},
- {'source': 5, 'target': 6, 'thickness': 5},
- {'source': 3, 'target': 2, 'thickness': 5},
- {'source': 1, 'target': 4, 'thickness': 7},
- {'source': 1, 'target': 6, 'thickness': 5},
- {'source': 2, 'target': 4, 'thickness': 7},
- {'source': 8, 'target': 2, 'thickness': 1},
- {'source': 7, 'target': 2, 'thickness': 2},
- {'source': 8, 'target': 5, 'thickness': 6},
- {'source': 2, 'target': 6, 'thickness': 9},
- {'source': 5, 'target': 3, 'thickness': 5},
- {'source': 6, 'target': 8, 'thickness': 3},
- {'source': 9, 'target': 6, 'thickness': 8},
- {'source': 9, 'target': 2, 'thickness': 8},
- {'source': 8, 'target': 4, 'thickness': 1},
- {'source': 8, 'target': 2, 'thickness': 5},
- {'source': 2, 'target': 5, 'thickness': 6},
- {'source': 4, 'target': 5, 'thickness': 6},
- {'source': 8, 'target': 6, 'thickness': 1}];
+var nodes = [
+  {% for vertex in vertices %}
+  {'category': 'category', 'name': {{ node.id }}, }
+  {% endfor %}
+];
+var edges = [
+  {% for edge in edges %}
+  {'source': edge.from_id, 'target': edge.to_id, 'thickness': edge.weight},
+  {% endfor %}
+];
 
 
 var drawD3Document = function(nodes,links) {
@@ -107,7 +87,7 @@ var focusVertex = function(focusCharacter){
 		return "rgb(230,230,230)";
 	};
 	focusOn(fVertex,fEdge);
-	
+
 };
 var focusCategory = function(focusCategory){
 	var fVertex = function(d){

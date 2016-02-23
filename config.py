@@ -3,4 +3,4 @@ class DevelopmentConfig:
     username = 'root'
     password = 'root'
     host = 'localhost'
-    database = 'bidsvisualization'
+    database = 'ecosystem_mapping'

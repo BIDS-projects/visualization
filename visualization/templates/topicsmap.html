@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block head %}
+<link href="/static/topicsmap.css" rel="stylesheet">
+<script src="/static/topicsmap.js"></script>
+<script>
+var nodes = [{% for vertex in vertices %}
+  {'category': 'category', 'name': {{ vertex.id }} },{% endfor %}
+];
+var edges = [{% for edge in edges %}
+  {'source': {{ edge.from_v }}, 'target': {{ edge.to_v }}, 'thickness': {{ edge.weight}} },{% endfor %}
+];
+var topics = [
+]
+</script>
+{% endblock %}
+{% block content %}
+<body onload="drawD3Document(nodes,edges)">
+  <section class="col-md-9">
+    <div id="canvas-svg"></div>
+  </section>
+  <aside class="col-md-3 info">
+    <div class="info-blurb">
+      <h2 class="subtitle">Topics</h2>
+    </div>
+    <ul>
+      <li>
+        <div class="color-label col-md-2"><span class="color-box" style="background-color:rgba(90, 120, 150, 1)"></span></div>
+        <div class="text-label col-md-10"><span>Topic 1</span></div>
+      </li>
+    </ul>
+    {% for topic in topics %}
+    {% endfor %}
+  </aside>
+</body>
+{% endblock %}

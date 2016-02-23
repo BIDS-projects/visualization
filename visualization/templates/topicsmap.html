@@ -19,45 +19,34 @@ circle {
 }
 
 text {
+  fill: #000;
   font: 10px sans-serif;
   pointer-events: none;
 }
-
-#form {
-	position: absolute;
-	bottom: 10px;
-}
-
 </style>
 
 <script>
 var nodes = [
   {% for vertex in vertices %}
-  {'category': 'category', 'name': {{ node.id }}, }
-  {% endfor %}
+  {'category': 'category', 'name': {{ vertex.id }} },{% endfor %}
 ];
 var edges = [
   {% for edge in edges %}
-  {'source': edge.from_id, 'target': edge.to_id, 'thickness': edge.weight},
-  {% endfor %}
+  {'source': {{ edge.from_v }}, 'target': {{ edge.to_v }}, 'thickness': {{ edge.weight}} },{% endfor %}
 ];
 
 
 var drawD3Document = function(nodes,links) {
 	var WIDTH = $(document).width(), HEIGHT = $(document).height();
     var width = WIDTH, height = HEIGHT;
-    var force = d3.layout.force().nodes(d3.values(nodes)).links(links).size([ width, height ]).linkDistance(100).charge(-1000).on("tick", tick);
+    var force = d3.layout.force().nodes(d3.values(nodes)).links(links).size([ width, height ]).linkDistance(50).charge(-3000).on("tick", tick);
     var svg = d3.select("#canvas-svg").append("svg").attr("width", width).attr("height", height);
     svg.append("svg:defs").selectAll("marker").data([ "end" ]).enter().append("svg:marker").attr("id", String).attr("viewBox", "0 -5 10 10").attr("refX", 15).attr("refY", -1.5).attr("markerWidth", 6).attr("markerHeight", 6).attr("orient", "auto").append("svg:path").attr("d", "M0,-5L10,0L0,5");
     var path = svg.append("svg:g").selectAll("path").data(force.links()).enter().append("svg:path").style('stroke-width',function(d){return d.thickness}).attr("class", "link");
-    //var path = svg.append("svg:g").selectAll("path").data(force.links()).enter().append("svg:path").attr("class", "link").attr("marker-end", "url(#end)");
 
     var node = svg.selectAll(".node").data(force.nodes()).enter().append("g").attr("class", "node").call(force.drag);
     node.append("circle").attr("r", 10);
-    /*node.append("p").attr("x", 12).attr("dy", ".35em").text(function(d) {
-        return d.name;
-    });*/
-        node.append("text").attr("x", "-.1em").attr("dy", ".35em").text(function(d) {
+    node.append("p").attr("x", 12).attr("dy", ".35em").text(function(d) {
         return d.name;
     });
     force.start();
@@ -77,7 +66,7 @@ var focusOn = function(f1,f2){
 	var svg = d3.select("#canvas-svg");
 	var node = svg.selectAll(".node");
 	node.select('circle').style('fill', f1);
-	node.select('text').style('fill',f1);
+	node.select('p').style('color',f1);
 	var edges = svg.selectAll('.link');
 	edges.style('stroke',f2);
 }
@@ -116,12 +105,10 @@ var focusCategory = function(focusCategory){
 </script>
 <body onload="drawD3Document(nodes,edges)">
 <div id="canvas-svg"></div>
-<div id='form'>
 <input id='vtx'>
-<button onclick="focusVertex($('#vtx').val())"> Focus on Vertex </button> (Possible Vertices: a,b,c,d,e,f,g,h,i,j) <br />
+<button onclick="focusVertex($('#vtx').val())"> HIII </button>
 <input id='cat'>
-<button onclick="focusCategory($('#cat').val())"> Focus on Category </button> (Possible Categories: dibya,alvin,blake)
-</div>
+<button onclick="focusCategory($('#cat').val())"> HIII </button>
 </body>
 
 </html>

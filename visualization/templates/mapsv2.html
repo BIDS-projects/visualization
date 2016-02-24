@@ -135,13 +135,20 @@ var focusCategory = function(focusCategory){
 };
 </script>
 <body onload="drawD3Document(nodes,edges)">
-<div id="canvas-svg"></div>
-<div id='form'>
-<input id='vtx'>
-<button onclick="focusVertex($('#vtx').val())"> Focus on Vertex </button> (Possible Vertices: a,b,c,d,e,f,g,h,i,j) <br />
-<input id='cat'>
-<button onclick="focusCategory($('#cat').val())"> Focus on Category </button> (Possible Categories: dibya,alvin,blake)
-</div>
+  <section class="col-md-9">
+    <div id="canvas-svg"></div>
+  </section>
+  <aside class="col-md-3 info">
+    <div class="info-blurb">
+      <h2 class="subtitle">Topics</h2>
+    </div>
+    <ul>
+      <li onclick="catColorAlpha('dibya')">
+        <div class="color-label col-md-2"><span class="color-box" style="background-color:rgb({{ ','.join(colors[category]) }})"></span></div>
+        <div class="text-label col-md-10"><span>{{ category }}</span></div>
+      </li>
+    </ul>
+  </aside>
 </body>
 
 </html>

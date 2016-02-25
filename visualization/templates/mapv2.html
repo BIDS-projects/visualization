@@ -2,6 +2,7 @@
 <head>
     <title>BIDS IEM</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <link href='https://fonts.googleapis.com/css?family=Lato:400,300' rel='stylesheet' type='text/css'>
@@ -89,6 +90,7 @@ aside.info {
 }
 aside ul {
   padding:0;
+  margin-bottom: 4em;
 }
 aside li, aside ul {
   list-style:none;
@@ -105,6 +107,10 @@ aside li, aside ul {
     border-top:none;
   }
 
+#focushref {
+  display:block;
+  text-align:center;
+}
 </style>
 
 <script>
@@ -442,178 +448,281 @@ names.push(nodes[i].name);
 
 var center = "";
 var force;
-var drawD3Document = function(nodes,links) {
-	$("#search").typeahead({ source:names, afterSelect: function(val){focusVertex(val);} });
-	var WIDTH = $(document).width(), HEIGHT = $(document).height();
-    var width = WIDTH, height = HEIGHT;
-    force = d3.layout.force().nodes(d3.values(nodes)).links(links).size([ 9*width/12, height ]).linkDistance(50).charge(-3000).on("tick", tick);
-    var svg = d3.select("#canvas-svg").append("svg").attr("width", width).attr("height", height);
-    svg.append("svg:defs").selectAll("marker").data([ "end" ]).enter().append("svg:marker").attr("id", String).attr("viewBox", "0 -5 10 10").attr("refX", 15).attr("refY", -1.5).attr("markerWidth", 6).attr("markerHeight", 6).attr("orient", "auto").append("svg:path").attr("d", "M0,-5L10,0L0,5");
-    var path = svg.append("svg:g").selectAll("path").data(force.links()).enter().append("svg:path").style('stroke-width',function(d){return d.thickness}).attr("class", "link");
-
-    var node = svg.selectAll(".node").data(force.nodes()).enter().append("g").attr("class", "node").call(force.drag);
-    node.append("circle").attr("r", 10);
-    node.append("p").attr("x", 12).attr("dy", ".35em").text(function(d) {
-        return d.name;
-    });
-    force.start();
-    for (var i = 0; i < 100; ++i) force.tick();
-    force.stop();
-    function tick() {
-    	node.attr("transform", function(d) {
-        	if(d.name==center){
-        		d.x = WIDTH/3;
-        		d.y = HEIGHT/2;
-        	}
-            return "translate(" + d.x + "," + d.y + ")";
-        });
-        path.attr("d", function(d) {
-            var dx = d.target.x - d.source.x, dy = d.target.y - d.source.y, dr = Math.sqrt(dx * dx + dy * dy);
-            return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
-        });
-        
-    }
-    $( ".node" ).contextmenu(function() {
-  focusVertex(this.textContent);
-  return false;
-	});
-};
-//Colors all the nodes based on relationship to category (only one selected) 
-var catColorAlpha = function(focusCategory){
-	var dict = categories[focusCategory];
-	var rgb = colors[focusCategory];
-	var rgbaString = "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2];
-	var colorCalcVert = function(d){
-	 // We are going to add alpha in the loop
-		for (i = 0; i < 10; i += 1){ // Probably a better way to do this, will revisit. // 
-			var strNum = i.toString();
-			if (strNum == d.name){
-				rgbaString + "," + dict[strNum] + ")";
-				return rgbaString + "," + dict[strNum] + ")";
-			}
-		}
-	}
-	var colorCalcEdge = function(d){
-		var alpha1 = d.source.name.toString();
-		var alpha2 = d.target.name.toString();
-		return  rgbaString + "," + Math.max(dict[alpha1], dict[alpha2]);
-	}
-	focusOn(colorCalcVert,colorCalcEdge);
-
-}
-// This will color every vertex by its most related category.
-//var eachCatColor = function(){
-
 //}
-var catColor = function(focusCategory){
-	var rgb = colors[focusCategory]
-	var checkVert = function(d){
-		if (d.category == focusCategory){
-			return "rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ")"
-		return "rgb(230, 230, 230)"
-		}
-	}
-	var checkEdge = function(d){
-		if (d.source.category == focusCategory || d.target.category == focusCategory){
-			return "rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ")"
-		}
-		return "rgb(230, 230, 230)"
-			
-	}
-	focusOn(checkVert, checkEdge);
-}
-var focusOn = function(f1,f2){
-	var svg = d3.select("#canvas-svg");
-	var node = svg.selectAll(".node");
-	node.select('circle').style('fill', f1);
-	node.select('p').style('color',f1);
-	var edges = svg.selectAll('.link');
-	edges.style('stroke',f2);
-}
 
-// Colors vertices and edges based on a specific vertex (non weighted <rgb>)
-var focusVertex = function(focusCharacter){
-	center = focusCharacter;
-	var fVertex = function(d){
-		if(d.name==focusCharacter){
-	    force.start();
-	    for (var i = 0; i < 10; ++i) force.tick();
-	    force.stop();
-		$("#focusname").text(d.name);
-		$("#focushref").attr("href", d.link);
-		$("#focushref").text("Link to Main Page");
-		$("#focusdesc").text(d.purpose);
-
-			return "rgb(0,0,0)";
-		};	
-		return "rgb(230,230,230)";
-	};
-	var fEdge = function(d){
-		if(d.source.name==focusCharacter || d.target.name==focusCharacter){
-				return "rgb(0,0,0)";
-		};
-		return "rgb(230,230,230)";
-	};
-	focusOn(fVertex,fEdge);
-	
-};
-// Colors vertices and edges based on a category (non weighted <rgb>)
-var focusCategory = function(focusCategory){
-	var fVertex = function(d){
-		if(d.category==focusCategory){
-			return "rgb(0,0,0)";
-		};
-		return "rgb(230,230,230)";
-	};
-	var fEdge = function(d){
-		if(d.source.category==focusCategory || d.target.category==focusCategory){
-				return "rgb(0,0,0)";
-		};
-		return "rgb(230,230,230)";
-	};
-	focusOn(fVertex,fEdge);
-}
-
-$(document).ready(function () {
-
-});
 </script>
-<body onload="drawD3Document(nodes,edges)">
-  <section class="col-md-9">
+<body ng-app="myApp" ng-controller="myCtrl">
+  <section class="col-lg-9">
     <div id="canvas-svg"></div>
   </section>
-  <aside class="col-md-3 info">
+  <aside class="col-lg-3 info">
   <h1 class="title"> BIDS IEM Visualization </h1>
-    <div class="info-blurb">
-      <h3 class="subtitle">Topics</h2>
-    </div>
+
     <div class="form-group has-feedback">
     	<input type="text" class="form-control " id="search" data-provide="typeahead" />
     	<i class="glyphicon glyphicon-search form-control-feedback"></i>
     	</div>
+          <div class="info-blurb">
+      <h3 class="subtitle">Topics</h2>
+    </div>
     <ul>
-      <li onclick="catColorAlpha('Visualization')">
+        <li ng-click="catAllColorAlpha()">
+        <div class="color-label col-md-2"><span class="color-box" style="background-color:rgb(218,165,32)"></span></div>
+        <div class="text-label col-md-10"><span>All</span></div
+>      </li>
+      <li ng-click="catColorAlpha('Visualization')">
         <div class="color-label col-md-2"><span class="color-box" style="background-color:rgb(0,169,190)"></span></div>
-        <div class="text-label col-md-10"><span>Visualization</span></div>
-      </li>
-      <li onclick="catColorAlpha('Computation')">
+        <div class="text-label col-md-10"><span>Visualization</span></div
+>      </li>
+      <li ng-click="catColorAlpha('Computation')">
         <div class="color-label col-md-2"><span class="color-box" style="background-color:rgb(100,0,0)"></span></div>
         <div class="text-label col-md-10"><span>Computation</span></div>
       </li>
-      <li onclick="catColorAlpha('Social Sciences')">
+      <li ng-click="catColorAlpha('Social Sciences')">
         <div class="color-label col-md-2"><span class="color-box" style="background-color:rgb(50,70,150)"></span></div>
         <div class="text-label col-md-10"><span>Social Sciences</span></div>
       </li>
-      <li onclick="catColorAlpha('Theory')">
+      <li ng-click="catColorAlpha('Theory')">
         <div class="color-label col-md-2"><span class="color-box" style="background-color:rgb(200,100,100)"></span></div>
         <div class="text-label col-md-10"><span>Theory</span></div>
       </li>
     </ul>
-    <h3 id="focusname"></h3>
-    <p id="focusdesc"> </p>
-    <a id="focushref" href="#"></a>
+    <div id="domainfocus" ng-hide="domainshow">
+      <h3 id="focusname"></h3>
+      <p id="focusdesc"> </p>
+      <a id="focushref" href="#"></a> <br />
+      <h5> Nearest Neighbors </h5>
+      <ul>
+      <li ng-click="focusVertex(degree[0])" ng-repeat="degree in closest"> {{degree[0]}}</li>
+      </ul>
+      <a ng-click="domainshow=true">
+        <span class="glyphicon glyphicon-menu-left"> Back</span>
+      </a>
+    </div>
+
+    <div id="basefocus" ng-show="domainshow">
+    <h3 class="subtitles"> Most Popular Domains </h3>
+    <ul>
+    <li ng-click="focusVertex(degree[0])" ng-repeat="degree in topdegrees"> {{degree[0]}}</li>
+    </ul>
+    </div>
 
   </aside>
+  <script>
+  var app = angular.module('myApp', []);
+  app.controller('myCtrl', function($scope) {
+  $scope.drawD3Document = function(nodes,links) {
+    var WIDTH = $(document).width(), HEIGHT = $(document).height();
+      force = d3.layout.force().nodes(d3.values(nodes)).links(links).size([ 9*WIDTH/12, HEIGHT ]).linkDistance(50).charge(-3000).on("tick", tick);
+      var svg = d3.select("#canvas-svg").append("svg").attr("width", WIDTH).attr("height", HEIGHT);
+      svg.append("svg:defs").selectAll("marker").data([ "end" ]).enter().append("svg:marker").attr("id", String).attr("viewBox", "0 -5 10 10").attr("refX", 15).attr("refY", -1.5).attr("markerWidth", 6).attr("markerHeight", 6).attr("orient", "auto").append("svg:path").attr("d", "M0,-5L10,0L0,5");
+      var path = svg.append("svg:g").selectAll("path").data(force.links()).enter().append("svg:path").style('stroke-width',function(d){return d.thickness}).attr("class", "link");
+
+      var node = svg.selectAll(".node").data(force.nodes()).enter().append("g").attr("class", "node").call(force.drag);
+      node.append("circle").attr("r", 10);
+      node.append("p").attr("x", 12).attr("dy", ".35em").text(function(d) {
+          return d.name;
+      });
+      force.start();
+      for (var i = 0; i < 100; ++i) force.tick();
+      force.stop();
+      function tick() {
+          path.attr("d", function(d) {
+              var dx = d.target.x - d.source.x, dy = d.target.y - d.source.y, dr = Math.sqrt(dx * dx + dy * dy);
+              return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
+          });
+          node.attr("transform", function(d) {
+            if(d.name==center){
+              d.x = WIDTH/3;
+              d.y = HEIGHT/2;
+            }
+              return "translate(" + d.x + "," + d.y + ")";
+          });
+      }
+    };
+    $scope.domainshow = true;
+    $scope.closest = [];
+    $scope.generateDegreeList = function(){
+      var degrees = [];
+      for(var i = 0; i < nodes.length;i++) degrees.push([nodes[i].name,0]);
+      edges.forEach(function(curr){
+        degrees[curr.source.index][1]+=curr.thickness;
+        degrees[curr.target.index][1]+=curr.thickness;
+      });
+      degrees.sort(function(a,b){
+        return b[1]-a[1];
+      });
+      return degrees;
+    }
+    $scope.generateCategoryDegreeList = function(category){
+      var degrees = [];
+      for(var i = 0; i < nodes.length;i++) degrees.push([nodes[i].name,0]);
+      edges.forEach(function(curr){
+        if(findBestColor(curr.source.name)==category){
+          degrees[curr.source.index][1]+=curr.thickness;
+        }
+        if(findBestColor(curr.target.name)==category){
+          degrees[curr.target.index][1]+=curr.thickness;
+        }      });
+      degrees.sort(function(a,b){
+        return b[1]-a[1];
+      });
+      return degrees;
+    }
+    $scope.generateClosestDegreeList = function(closest){
+      var degrees = [];
+      for(var i = 0; i < nodes.length;i++) degrees.push([nodes[i].name,0]);
+      edges.forEach(function(curr){
+        if(curr.source.name==closest){
+          degrees[curr.target.index][1]+=curr.thickness;
+        }
+        if(curr.target.name==closest){
+          degrees[curr.source.index][1]+=curr.thickness;
+        }
+      });
+      degrees.sort(function(a,b){
+        return b[1]-a[1];
+      });
+      return degrees;
+    }
+
+    $scope.catColor = function(focusCategory){
+      var rgb = colors[focusCategory]
+      var checkVert = function(d){
+        if (d.category == focusCategory){
+          return "rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ")"
+        return "rgb(230, 230, 230)"
+        }
+      }
+      var checkEdge = function(d){
+        if (d.source.category == focusCategory || d.target.category == focusCategory){
+          return "rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ")"
+        }
+        return "rgb(230, 230, 230)"
+          
+      }
+      focusOn(checkVert, checkEdge);
+    }
+    var focusOn = function(f1,f2){
+      var svg = d3.select("#canvas-svg");
+      var node = svg.selectAll(".node");
+      node.select('circle').style('fill', f1);
+      node.select('p').style('color',f1);
+      var edges = svg.selectAll('.link');
+      edges.style('stroke',f2);
+    }
+
+// Colors vertices and edges based on a specific vertex (non weighted <rgb>)
+    var findBestColor = function(focusNode){
+      var bestcategory = "";
+      var bestval = 0;
+      for (var cat in categories) {
+        if (categories.hasOwnProperty(cat)) {
+          if(categories[cat][focusNode] > bestval){
+            bestcategory = cat;
+            bestval = categories[cat][focusNode];
+          }
+        }
+      }
+      return bestcategory;
+    };
+
+    $scope.focusVertex = function(focusCharacter){
+      center = focusCharacter;
+      var fVertex = function(d){
+        if(d.name==focusCharacter){
+          force.start();
+        $("#focusname").text(d.name);
+        $("#focushref").attr("href", d.link);
+        $("#focushref").text("Link to Main Page");
+        $("#focusdesc").text(d.purpose);
+        $scope.closest = $scope.generateClosestDegreeList(d.name).slice(0,3);
+        $scope.domainshow = false;
+
+          return "rgb(0,0,0)";
+        };  
+        return "rgb(230,230,230)";
+      };
+      var fEdge = function(d){
+        if(d.source.name==focusCharacter || d.target.name==focusCharacter){
+            return "rgb(0,0,0)";
+        };
+        return "rgb(230,230,230)";
+      };
+      focusOn(fVertex,fEdge);
+      
+    };
+// Colors vertices and edges based on a category (non weighted <rgb>)
+    $scope.focusCategory = function(focusCategory){
+      var fVertex = function(d){
+        if(d.category==focusCategory){
+          return "rgb(0,0,0)";
+        };
+        return "rgb(230,230,230)";
+      };
+      var fEdge = function(d){
+        if(d.source.category==focusCategory || d.target.category==focusCategory){
+            return "rgb(0,0,0)";
+        };
+        return "rgb(230,230,230)";
+      };
+      focusOn(fVertex,fEdge);
+    }
+
+    //Colors all the nodes based on relationship to category (only one selected) 
+    $scope.catColorAlpha = function(focusCategory){
+      var dict = categories[focusCategory];
+      var rgb = colors[focusCategory];
+      var rgbaString = "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2];
+      var colorCalcVert = function(d){
+       // We are going to add alpha in the loop
+            return rgbaString + "," + dict[d.name] + ")";  
+      }
+      var colorCalcEdge = function(d){
+        var alpha1 = d.source.name.toString();
+        var alpha2 = d.target.name.toString();
+        return  rgbaString + "," + Math.max(dict[alpha1], dict[alpha2]);
+      }
+      focusOn(colorCalcVert,colorCalcEdge);
+      $scope.topdegrees = $scope.generateCategoryDegreeList(focusCategory).slice(0,5);
+
+    };
+
+    $scope.catAllColorAlpha = function(){
+      var colorCalcVert = function(d){
+       // We are going to add alpha in the loop
+        var focusCategory = findBestColor(d.name);
+        var dict = categories[focusCategory];
+        var rgb = colors[focusCategory];
+        var rgbaString = "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2]+","+categories[focusCategory][d.name]+")";
+        return rgbaString;
+      }
+      var colorCalcEdge = function(d){
+        var alpha1 = d.source.name;
+        var focusCategory = findBestColor(alpha1);
+        var dict = categories[focusCategory];
+        var rgb = colors[focusCategory];
+        var rgbaString = "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2]+","+categories[focusCategory][alpha1]+")";
+        return rgbaString;
+      }
+      focusOn(colorCalcVert,colorCalcEdge);
+      $scope.topdegrees = $scope.generateDegreeList().slice(0,5);
+    };
+
+
+    $("#search").typeahead({ source:names, afterSelect: function(val){$scope.focusVertex(val); $scope.$apply();} });
+    $scope.drawD3Document(nodes,edges);
+    $scope.catAllColorAlpha();
+    $( ".node" ).contextmenu(function() {
+      $scope.focusVertex(this.textContent);
+      $scope.$apply();
+      return false;
+    });
+
+
+
+});
+</script>
 </body>
 
 </html>

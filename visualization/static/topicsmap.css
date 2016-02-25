@@ -25,9 +25,13 @@ text {
   z-index:1;
 }
 
+#search {
+  margin-right: 100px;
+}
+
 #form {
-	position: fixed;
-	bottom: 10px;
+  position: fixed;
+  bottom: 10px;
   z-index:21;
 }
 h1 {
@@ -72,6 +76,7 @@ aside.info {
 }
 aside ul {
   padding:0;
+  margin-bottom: 4em;
 }
 aside li, aside ul {
   list-style:none;
@@ -79,7 +84,7 @@ aside li, aside ul {
   width:100%;
 }
   aside li {
-    padding:1em 2em;
+    padding:1em 5em;
     border-top:1px solid #eee;
     border-bottom:1px solid #eee;
     cursor:pointer;
@@ -87,3 +92,8 @@ aside li, aside ul {
   aside li + li {
     border-top:none;
   }
+
+#focushref {
+  display:block;
+  text-align:center;
+}

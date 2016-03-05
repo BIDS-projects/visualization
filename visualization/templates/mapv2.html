@@ -141,7 +141,7 @@ aside li, aside ul {
 
     <h3 class="subtitle"> Top Institutions </h3>
     <ul>
-    <li ng-click="focusVertex(degree[0])" ng-repeat="degree in topdegrees"> {{degree[0]}}</li>
+    <li ng-click="focusVertex(degree[0],false)" ng-repeat="degree in topdegrees"> {{degree[0]}}</li>
     </ul>
     </div>
     <div id="domainfocus" ng-hide="domainshow">
@@ -155,7 +155,7 @@ aside li, aside ul {
       </ul>
       <h5> Nearest Neighbors </h5>
       <ul>
-      <li ng-click="focusVertex(degree[0])" ng-repeat="degree in closest"> {{degree[0]}}</li>
+      <li ng-click="focusVertex(degree[0],false)" ng-repeat="degree in closest"> {{degree[0]}}</li>
       </ul>
       <a ng-click="domainshow=true">
         <span class="glyphicon glyphicon-menu-left"> Back</span>
@@ -213,6 +213,7 @@ aside li, aside ul {
     $scope.bestcategories = [];
     $scope.colors = colors;
     $scope.allcategories = [];
+    $scope.focused = false;
     for (var cat in categories) {
         if (categories.hasOwnProperty(cat)) {
           $scope.allcategories.push(cat);
@@ -319,11 +320,16 @@ aside li, aside ul {
       return categorys;
     }
 
-    $scope.focusVertex = function(focusCharacter){
-      center = focusCharacter;
+    $scope.focusVertex = function(focusCharacter,onHover){
+      if(!onHover){
+        center = focusCharacter;
+        $scope.focused = true;
+      }
       var fVertex = function(d){
         if(d.name==focusCharacter){
+          if(!onHover){
           force.start();
+        }
         $("#focusname").text(d.name);
         $("#focushref").attr("href", d.link);
         $("#focushref").text("Link to Main Page");
@@ -336,6 +342,12 @@ aside li, aside ul {
         }; 
         var rgb = findBestColor(d.name,false);
         rgb = rgb.substring(4,rgb.length-1);
+        if(onHover){
+          if(connectsTo(d.name,focusCharacter)){
+          return "rgba("+rgb+", .8)"
+        } 
+        return "rgba("+rgb+", .5)";
+        }
         if(connectsTo(d.name,focusCharacter)){
           return "rgba("+rgb+", .5)"
         } 
@@ -343,9 +355,12 @@ aside li, aside ul {
       };
       var fEdge = function(d){
         if(d.source.name==focusCharacter || d.target.name==focusCharacter){
-            return "rgb(0,0,0)";
+            return findBestColor(focusCharacter,true);
         };
-        return "rgb(230,230,230)";
+        if(onHover){
+            return "rgba(230,230,230,.7)";
+        }
+        return "rgba(230,230,230,.5)";
       };
       focusOn(fVertex,fEdge);
       
@@ -369,9 +384,12 @@ aside li, aside ul {
 
     //Colors all the nodes based on relationship to category (only one selected) 
     $scope.catColorAlpha = function(focusCategory){
+      $scope.focused = false;
+      center = "";
       var dict = categories[focusCategory];
       var rgb = colors[focusCategory];
       var rgbaString = "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2];
+      $scope.domainshow = true;
       var colorCalcVert = function(d){
        // We are going to add alpha in the loop
             return rgbaString + "," + dict[d.name] + ")";  
@@ -395,6 +413,9 @@ aside li, aside ul {
       return "rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2]+")";
     };
     $scope.catAllColorAlpha = function(){
+      $scope.focused = false;
+      $scope.domainshow = true;
+      center = "";
       var colorCalcVert = function(d){
        return findBestColor(d.name,true);
       }
@@ -407,13 +428,26 @@ aside li, aside ul {
     };
 
 
-    $("#search").typeahead({ source:names, afterSelect: function(val){$scope.focusVertex(val); $scope.$apply();} });
+    $("#search").typeahead({ source:names, afterSelect: function(val){$scope.focusVertex(val,false); $scope.$apply();} });
     $scope.drawD3Document(nodes,edges);
     $scope.catAllColorAlpha();
     $( ".node" ).contextmenu(function() {
-      $scope.focusVertex(this.textContent);
+      $scope.focusVertex(this.textContent,false);
       $scope.$apply();
       return false;
+    });
+    $( ".node" ).mouseenter(function() {
+      if(!$scope.focused){
+        $scope.focusVertex(this.textContent,true);
+        $scope.$apply();
+      }
+      return false;
+    }).mouseleave(function(){
+      if(!$scope.focused){
+      $scope.catAllColorAlpha();
+            $scope.$apply();
+          }
+
     });
 
 });

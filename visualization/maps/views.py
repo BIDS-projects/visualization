@@ -45,7 +45,7 @@ def home():
                 'link':data[vertex.domain][1], 'desc':data[vertex.domain][2]}
             new_vertices.append(node)
         mapper[vertex.id] = i
-    edges = Edge.query.filter_by(graph_id=graph.id).all()
+    edges = Edge.query.filter_by(graph_id=graph.id).order_by(Edge.weight).all()
     mean = sum(e.weight for e in edges)/len(edges)
     sigma = (sum((e.weight-mean)**2 for e in edges)/len(edges))**.5
     edges = [edge for edge in edges if edge.weight > mean+sigma]

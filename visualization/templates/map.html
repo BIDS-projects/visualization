@@ -10,12 +10,22 @@ circle.node {
 cursor: pointer;
 stroke: #000;
 stroke-width: .5px;
+position:relative;
 }
 
 line.link {
 fill: none;
 stroke: #9ecae1;
 stroke-width: 1.5px;
+}
+
+circle.node::before {
+  content:"helloworld";
+  position:absolute;
+  font-size:12px;
+  top:0;
+  left:0;
+  color:#000;
 }
 
 </style>
@@ -92,6 +102,11 @@ node.enter().append("svg:circle")
   .attr("r", function(d) { return d.children ? 4.5 : Math.sqrt(d.size) / 10; })
   .style("fill", color)
   .on("click", click)
+  .attr("data-text", function(d) { return "Hello World!"})
+  //.enter().append("text")
+  //  .attr("dx", function(d) { return d.x; })
+  //  .attr("dy", function(d) { return d.y; })
+  //  .text(function(d) { return "hello world!" });
   .call(force.drag);
 
 // Exit any old nodes.
@@ -118,6 +133,7 @@ function click(d) {
 if (d.children) {
 d._children = d.children;
 d.children = null;
+
 } else {
 d.children = d._children;
 d._children = null;

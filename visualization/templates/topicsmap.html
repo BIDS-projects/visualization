@@ -1,0 +1,67 @@
+<% extends "base.html" %>
+<% block head %>
+<link href="/static/topicsmap.css" rel="stylesheet">
+<script>
+var nodes = [<% for vertex in vertices %>
+  {'category': 'category', 'name': '%% vertex['fullname'] %%', 'link': '%%vertex['link']%%', 'purpose':'%%vertex['desc']%%' },<% endfor %>
+];
+var edges = [<% for edge in edges %>
+  {'source': %% edge.from_v %%, 'target': %% edge.to_v %%, 'thickness': %% edge.weight %% },<% endfor %>
+];
+var categories = %% categories_json | safe %%;
+var colors = %% colors_json | safe %%;
+</script>
+<% endblock %>
+<% block content %>
+<body ng-app="myApp" ng-controller="myCtrl">
+  <section class="col-lg-9">
+    <div id="canvas-svg"></div>
+  </section>
+  <aside class="col-lg-3 info">
+  <h1 class="title"> BIDS IEM Visualization </h1>
+
+    <div class="form-group has-feedback">
+      <input type="text" class="form-control " id="search" data-provide="typeahead" />
+      <i class="glyphicon glyphicon-search form-control-feedback"></i>
+      </div>
+          <div id="basefocus" ng-show="domainshow">
+
+          <div class="info-blurb">
+      <h3 class="subtitle">Topics</h2>
+    </div>
+    <ul>
+        <li ng-click="catAllColorAlpha()">
+        <div class="color-label col-md-2"><span class="color-box" style="background-color:rgb(255,108,232)"></span></div>
+        <div class="text-label col-md-10"><span>All</span></div
+>      </li>
+      <li ng-click="catColorAlpha(category)" ng-repeat="category in allcategories"> <div class="color-label col-md-2"><span class="color-box" style="background-color:rgb({{colors[category][0]}},{{colors[category][1]}},{{colors[category][2]}})"></span></div>
+        <div class="text-label col-md-10"><span>{{category}}</span></div></li>
+    </ul>
+
+
+    <h3 class="subtitle"> Top Institutions </h3>
+    <ul>
+    <li ng-click="focusVertex(degree[0])" ng-repeat="degree in topdegrees"> {{degree[0]}}</li>
+    </ul>
+    </div>
+    <div id="domainfocus" ng-hide="domainshow">
+      <h3 id="focusname"></h3>
+      <p id="focusdesc"> </p>
+      <a id="focushref" href="#"></a> <br />
+      <h5> Top Categories </h5>
+      <ul>
+      <li ng-click="catColorAlpha(category)" ng-repeat="category in bestcategories"> <div class="color-label col-md-2"><span class="color-box" style="background-color:rgb({{colors[category][0]}},{{colors[category][1]}},{{colors[category][2]}})"></span></div>
+        <div class="text-label col-md-10"><span>{{category}}</span></div></li>
+      </ul>
+      <h5> Nearest Neighbors </h5>
+      <ul>
+      <li ng-click="focusVertex(degree[0])" ng-repeat="degree in closest"> {{degree[0]}}</li>
+      </ul>
+      <a ng-click="domainshow=true">
+        <span class="glyphicon glyphicon-menu-left"> Back</span>
+      </a>
+    </div>
+  </aside>
+  <script src="/static/topicsmap.js"></script>
+</body>
+<% endblock %>

@@ -48,17 +48,10 @@ def home():
     edges = Edge.query.filter_by(graph_id=graph.id).order_by(Edge.weight).all()
     mean = sum(e.weight for e in edges)/len(edges)
     sigma = (sum((e.weight-mean)**2 for e in edges)/len(edges))**.5
-    edges = [edge for edge in edges if edge.weight > mean+sigma]
-    mean = sum(e.weight for e in edges)/len(edges)
-    sigma = (sum((e.weight-mean)**2 for e in edges)/len(edges))**.5
-    most = max(e.weight for e in edges)
-    least = min(e.weight for e in edges)
-    diff = most - least
     for edge in edges:
-        edge.from_v = mapper[edge.from_id]
-        edge.to_v = mapper[edge.to_id]
+        edge.from_v = edge.from_id
+        edge.to_v = edge.to_id
         edge.weight = 3 + (edge.weight-mean)/sigma
-        #edge.weight = 5*((edge.weight - least)/diff)
     # temporary randomly-generated categories
     import random
     import json

@@ -77,7 +77,6 @@ class Vertex(Base):
     value = db.Column(db.Text)
     graph_id = ForeignColumn(db.Integer, db.ForeignKey('graph.id'))
 
-
 class Edge(Base):
     """abstract for a graph edge"""
 
